@@ -6,6 +6,7 @@ import org.neo4j.driver.*;
 import org.neo4j.driver.Record;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.neo4j.DataNeo4jTest;
+import org.springframework.data.neo4j.core.Neo4jTemplate;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.Neo4jContainer;
@@ -19,13 +20,23 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class DriverRepositoryTest {
 
     @Container
-    private static final Neo4jContainer<?> neo4jContainer = new Neo4jContainer<>("neo4j:4.2");
+    private static final Neo4jContainer<?> neo4jContainer = new Neo4jContainer<>("neo4j:4.2")
+            .self().withStartupAttempts(10).withAdminPassword("secret");
+
+    @Autowired
+    DriverRepository repository;
+
+    @Autowired
+    Neo4jTemplate template;
+
+    @Autowired
+    Driver driver;
 
     @DynamicPropertySource
     static void neo4jProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.neo4.uri", neo4jContainer::getBoltUrl);
+        registry.add("spring.neo4j.uri", neo4jContainer::getBoltUrl);
         registry.add("spring.neo4j.authentication.username", () -> "neo4j");
-        registry.add("spring.neo4j.authentication.password", neo4jContainer::getAdminPassword);
+        registry.add("spring.neo4j.authentication.password", () -> "secret");
     }
 
     @AfterEach
@@ -36,12 +47,6 @@ public class DriverRepositoryTest {
             );
         }
     }
-
-    @Autowired
-    DriverRepository repository;
-
-    @Autowired
-    Driver driver;
 
     @Test
     void saves_a_driver() {
