@@ -55,11 +55,12 @@ public class DriverRepositoryTest {
         DriverTransport boltTransport = template.save(new DriverTransport(DriverTransportType.BOLT));
         List<DriverSupportedTransport> supportedTransports = List.of(new DriverSupportedTransport(List.of("4.2"), boltTransport));
 
-        repository.save(new Neo4jDriver("https://example.com", false,supportedTransports));
+        Neo4jDriver neo4jDriver = new Neo4jDriver("https://example.com", false, supportedTransports);
+        repository.save(neo4jDriver);
 
         List<Neo4jDriver> drivers = template.findAll(Neo4jDriver.class);
         assertThat(drivers).hasSize(1)
-                .containsExactly(new Neo4jDriver("https://example.com", false,supportedTransports));
+                .containsExactly(neo4jDriver);
 
     }
 }
