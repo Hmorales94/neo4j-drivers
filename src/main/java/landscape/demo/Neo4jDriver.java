@@ -15,10 +15,12 @@ public class Neo4jDriver {
     @Id
     @GeneratedValue(GeneratedValue.UUIDGenerator.class)
     private UUID id;
-    private final String uri;
-    private final boolean official;
+    private String uri;
+    private boolean official;
     @Relationship(type = "SUPPORTS", direction = Relationship.Direction.OUTGOING)
-    private final List<DriverSupportedTransport> supportedTransports;
+    private List<DriverSupportedTransport> supportedTransports;
+
+    public Neo4jDriver() {}
 
     public Neo4jDriver(String uri, boolean official, List<DriverSupportedTransport> supportedTransports) {
         this.uri = uri;
@@ -40,6 +42,38 @@ public class Neo4jDriver {
             driver.id = uuid;
             return driver;
         }
+    }
+
+    public UUID getId() {
+        return id;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
+    public String getUri() {
+        return uri;
+    }
+
+    public void setUri(String uri) {
+        this.uri = uri;
+    }
+
+    public boolean isOfficial() {
+        return official;
+    }
+
+    public void setOfficial(boolean official) {
+        this.official = official;
+    }
+
+    public List<DriverSupportedTransport> getSupportedTransports() {
+        return supportedTransports;
+    }
+
+    public void setSupportedTransports(List<DriverSupportedTransport> supportedTransports) {
+        this.supportedTransports = supportedTransports;
     }
 
     @Override

@@ -1,5 +1,7 @@
 package landscape.demo;
 
+import org.springframework.data.neo4j.core.schema.GeneratedValue;
+import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.RelationshipProperties;
 import org.springframework.data.neo4j.core.schema.TargetNode;
 
@@ -8,6 +10,10 @@ import java.util.Objects;
 
 @RelationshipProperties
 public class DriverSupportedTransport {
+
+    @Id
+    @GeneratedValue
+    private Long id;
 
     private final List<String> versions;
 
