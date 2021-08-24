@@ -13,6 +13,8 @@ import org.testcontainers.containers.Neo4jContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Testcontainers
@@ -50,22 +52,14 @@ public class DriverRepositoryTest {
 
     @Test
     void saves_a_driver() {
-        repository.save(new Neo4jDriver("url", false, "HTTP"));
+        DriverTransport boltTransport = template.save(new DriverTransport(DriverTransportType.BOLT));
+        List<DriverSupportedTransport> supportedTransports = List.of(new DriverSupportedTransport(List.of("4.2"), boltTransport));
 
-        try (Session session = driver.session()) {
-            session.readTransaction(tx -> {
-               Result result = tx.run("MATCH (driver:Driver) RETURN driver");
-                Record driverRecord = result.single();
+        repository.save(new Neo4jDriver("https://example.com", false,supportedTransports));
 
-                assertThat(driverRecord.get("url").asString())
-                        .isEqualTo("url");
-                assertThat(driverRecord.get("official").asBoolean())
-                       .isFalse();
-                assertThat(driverRecord.get("transport").asString())
-                        .isEqualTo("HTTP");
-                return null;
-            });
-        }
+        List<Neo4jDriver> drivers = template.findAll(Neo4jDriver.class);
+        assertThat(drivers).hasSize(1)
+                .containsExactly(new Neo4jDriver("https://example.com", false,supportedTransports));
 
     }
 }
